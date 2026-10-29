@@ -1,0 +1,12 @@
+node_modules
+.env
+
+# Build artifacts
+/generated/
+/dist/
+
+# Prisma auto-generated AI skills
+/.agents/
+/.windsurf/
+/.claude/
+skills-lock.json
