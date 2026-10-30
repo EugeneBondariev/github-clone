@@ -43,6 +43,21 @@ router.post('/', async (req: Request, res: Response) => {
 	res.status(201).json(repo)
 })
 
+router.patch('/:id', async (req: Request, res: Response) => {
+	const { name, description } = req.body as {
+		name?: string
+		description?: string
+	}
+
+	const repo = await prisma.repository.update({
+		where: { id: Number(req.params.id) },
+		data: { name, description },
+		include: { owner: { select: { id: true, name: true } } },
+	})
+
+	res.json(repo)
+})
+
 router.delete('/:id', async (req: Request, res: Response) => {
 	await prisma.repository.delete({
 		where: { id: Number(req.params.id) },

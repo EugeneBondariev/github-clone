@@ -2,6 +2,7 @@ import 'dotenv/config'
 import express, { Request, Response, NextFunction } from 'express'
 import usersRouter from './routes/users'
 import reposRouter from './routes/repos'
+import authRouter from './routes/auth'
 
 const app = express()
 
@@ -12,8 +13,17 @@ app.use((req: Request, _res: Response, next: NextFunction) => {
 	next()
 })
 
+app.get('/', (_req: Request, res: Response) => {
+	res.json({ name: 'github-clone', version: '1.0.0' })
+})
+
+app.get('/health', (_req: Request, res: Response) => {
+	res.json({ status: 'ok' })
+})
+
 app.use('/users', usersRouter)
 app.use('/repos', reposRouter)
+app.use('/auth', authRouter)
 
 app.use((_req: Request, res: Response) => {
 	res.status(404).json({ error: 'not found' })

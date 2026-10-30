@@ -7,14 +7,31 @@ const prisma = new PrismaClient({
 	adapter: new PrismaPg({ connectionString: process.env.DATABASE_URL! }),
 })
 
+const userSelect = { id: true, name: true, email: true, createdAt: true }
+
 router.get('/', async (_req: Request, res: Response) => {
-	const users = await prisma.user.findMany()
+	const users = await prisma.user.findMany({ select: userSelect })
 	res.json(users)
+})
+
+router.get('/:id/repos', async (req: Request, res: Response) => {
+	const user = await prisma.user.findUnique({
+		where: { id: Number(req.params.id) },
+		include: { repositories: true },
+	})
+
+	if (!user) {
+		res.status(404).json({ error: 'user not found' })
+		return
+	}
+
+	res.json(user.repositories)
 })
 
 router.get('/:id', async (req: Request, res: Response) => {
 	const user = await prisma.user.findUnique({
 		where: { id: Number(req.params.id) },
+		select: userSelect,
 	})
 
 	if (!user) {
@@ -23,16 +40,6 @@ router.get('/:id', async (req: Request, res: Response) => {
 	}
 
 	res.json(user)
-})
-
-router.post('/', async (req: Request, res: Response) => {
-	const { name, email } = req.body as { name: string; email: string }
-
-	const user = await prisma.user.create({
-		data: { name, email },
-	})
-
-	res.status(201).json(user)
 })
 
 router.delete('/:id', async (req: Request, res: Response) => {
