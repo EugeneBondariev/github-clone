@@ -1,6 +1,7 @@
 import express, { Request, Response } from 'express'
 import { PrismaPg } from '@prisma/adapter-pg'
 import { PrismaClient } from '../generated/prisma/client'
+import { requireAuth, AuthRequest } from '../middleware/auth'
 
 const router = express.Router()
 const prisma = new PrismaClient({
@@ -28,12 +29,13 @@ router.get('/:id', async (req: Request, res: Response) => {
   res.json(repo)
 })
 
-router.post('/', async (req: Request, res: Response) => {
-  const { name, description, ownerId } = req.body as {
+router.post('/', requireAuth, async (req: Request, res: Response) => {
+  const { name, description } = req.body as {
     name: string
     description?: string
-    ownerId: number
   }
+
+  const ownerId = (req as AuthRequest).userId
 
   const repo = await prisma.repository.create({
     data: { name, description, ownerId },
@@ -43,25 +45,52 @@ router.post('/', async (req: Request, res: Response) => {
   res.status(201).json(repo)
 })
 
-router.patch('/:id', async (req: Request, res: Response) => {
+router.patch('/:id', requireAuth, async (req: Request, res: Response) => {
   const { name, description } = req.body as {
     name?: string
     description?: string
   }
+  const userId = (req as AuthRequest).userId
+  const repoId = Number(req.params.id)
 
-  const repo = await prisma.repository.update({
-    where: { id: Number(req.params.id) },
+  const repo = await prisma.repository.findUnique({ where: { id: repoId } })
+
+  if (!repo) {
+    res.status(404).json({ error: 'repository not found' })
+    return
+  }
+
+  if (repo.ownerId !== userId) {
+    res.status(403).json({ error: 'forbidden' })
+    return
+  }
+
+  const updated = await prisma.repository.update({
+    where: { id: repoId },
     data: { name, description },
     include: { owner: { select: { id: true, name: true } } },
   })
 
-  res.json(repo)
+  res.json(updated)
 })
 
-router.delete('/:id', async (req: Request, res: Response) => {
-  await prisma.repository.delete({
-    where: { id: Number(req.params.id) },
-  })
+router.delete('/:id', requireAuth, async (req: Request, res: Response) => {
+  const userId = (req as AuthRequest).userId
+  const repoId = Number(req.params.id)
+
+  const repo = await prisma.repository.findUnique({ where: { id: repoId } })
+
+  if (!repo) {
+    res.status(404).json({ error: 'repository not found' })
+    return
+  }
+
+  if (repo.ownerId !== userId) {
+    res.status(403).json({ error: 'forbidden' })
+    return
+  }
+
+  await prisma.repository.delete({ where: { id: repoId } })
 
   res.status(204).send()
 })

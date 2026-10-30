@@ -1,6 +1,7 @@
 import express, { Request, Response } from 'express'
 import { PrismaPg } from '@prisma/adapter-pg'
 import { PrismaClient } from '../generated/prisma/client'
+import { requireAuth, AuthRequest } from '../middleware/auth'
 
 const router = express.Router()
 const prisma = new PrismaClient({
@@ -42,10 +43,16 @@ router.get('/:id', async (req: Request, res: Response) => {
   res.json(user)
 })
 
-router.delete('/:id', async (req: Request, res: Response) => {
-  await prisma.user.delete({
-    where: { id: Number(req.params.id) },
-  })
+router.delete('/:id', requireAuth, async (req: Request, res: Response) => {
+  const userId = (req as AuthRequest).userId
+  const targetId = Number(req.params.id)
+
+  if (userId !== targetId) {
+    res.status(403).json({ error: 'forbidden' })
+    return
+  }
+
+  await prisma.user.delete({ where: { id: targetId } })
 
   res.status(204).send()
 })
