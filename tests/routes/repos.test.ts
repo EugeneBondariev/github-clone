@@ -2,13 +2,24 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
 import request from 'supertest'
 import jwt from 'jsonwebtoken'
 
-const { mockFindMany, mockFindUnique, mockCreate, mockUpdate, mockDelete } = vi.hoisted(() => ({
-  mockFindMany: vi.fn(),
-  mockFindUnique: vi.fn(),
-  mockCreate: vi.fn(),
-  mockUpdate: vi.fn(),
-  mockDelete: vi.fn(),
-}))
+const { mockFindMany, mockFindUnique, mockCreate, mockUpdate, mockDelete, PrismaKnownError } =
+  vi.hoisted(() => {
+    class PrismaKnownError extends Error {
+      code: string
+      constructor(code: string) {
+        super('Prisma error')
+        this.code = code
+      }
+    }
+    return {
+      mockFindMany: vi.fn(),
+      mockFindUnique: vi.fn(),
+      mockCreate: vi.fn(),
+      mockUpdate: vi.fn(),
+      mockDelete: vi.fn(),
+      PrismaKnownError,
+    }
+  })
 
 vi.mock('../../generated/prisma/client', () => ({
   PrismaClient: class {
@@ -21,6 +32,7 @@ vi.mock('../../generated/prisma/client', () => ({
       delete: mockDelete,
     }
   },
+  Prisma: { PrismaClientKnownRequestError: PrismaKnownError },
 }))
 
 vi.mock('@prisma/adapter-pg', () => ({
@@ -85,6 +97,16 @@ describe('POST /repos', () => {
       .send({ name: 'my-repo' })
     expect(res.status).toBe(201)
     expect(res.body.ownerId).toBe(1)
+  })
+
+  it('returns 409 for duplicate repo name', async () => {
+    mockCreate.mockRejectedValue(new PrismaKnownError('P2002'))
+    const res = await request(app)
+      .post('/repos')
+      .set('Authorization', `Bearer ${token(1)}`)
+      .send({ name: 'my-repo' })
+    expect(res.status).toBe(409)
+    expect(res.body.error).toBe('repository name already exists')
   })
 })
 

@@ -1,6 +1,15 @@
 import express, { Request, Response } from 'express'
 import { requireAuth } from '../middleware/auth'
-import { writeBlob, readBlob, writeTree, readTree, TreeEntry, writeCommit, readCommit, CommitData } from '../git/objects'
+import {
+  writeBlob,
+  readBlob,
+  writeTree,
+  readTree,
+  TreeEntry,
+  writeCommit,
+  readCommit,
+  CommitData,
+} from '../git/objects'
 import { writeRef, readRef, listRefs } from '../git/refs'
 
 const router = express.Router()
@@ -56,8 +65,12 @@ router.get('/repos/:repoId/refs', (req: Request, res: Response) => {
 })
 
 router.get('/repos/:repoId/refs/:branch', (req: Request, res: Response) => {
-  const sha = readRef(Number(req.params.repoId), req.params.branch as string)
-  res.json({ branch: req.params.branch, sha })
+  try {
+    const sha = readRef(Number(req.params.repoId), req.params.branch as string)
+    res.json({ branch: req.params.branch, sha })
+  } catch {
+    res.status(404).json({ error: 'ref not found' })
+  }
 })
 
 export default router

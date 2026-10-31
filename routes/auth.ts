@@ -2,7 +2,7 @@ import express, { Request, Response } from 'express'
 import bcrypt from 'bcrypt'
 import jwt from 'jsonwebtoken'
 import { PrismaPg } from '@prisma/adapter-pg'
-import { PrismaClient } from '../generated/prisma/client'
+import { PrismaClient, Prisma } from '../generated/prisma/client'
 
 const router = express.Router()
 const prisma = new PrismaClient({
@@ -20,12 +20,19 @@ router.post('/register', async (req: Request, res: Response) => {
 
   const hashed = await bcrypt.hash(password, SALT_ROUNDS)
 
-  const user = await prisma.user.create({
-    data: { name, email, password: hashed },
-    select: { id: true, name: true, email: true, createdAt: true },
-  })
-
-  res.status(201).json(user)
+  try {
+    const user = await prisma.user.create({
+      data: { name, email, password: hashed },
+      select: { id: true, name: true, email: true, createdAt: true },
+    })
+    res.status(201).json(user)
+  } catch (err) {
+    if (err instanceof Prisma.PrismaClientKnownRequestError && err.code === 'P2002') {
+      res.status(409).json({ error: 'email already in use' })
+      return
+    }
+    throw err
+  }
 })
 
 router.post('/login', async (req: Request, res: Response) => {

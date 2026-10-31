@@ -1,6 +1,6 @@
 import express, { Request, Response } from 'express'
 import { PrismaPg } from '@prisma/adapter-pg'
-import { PrismaClient } from '../generated/prisma/client'
+import { PrismaClient, Prisma } from '../generated/prisma/client'
 import { requireAuth, AuthRequest } from '../middleware/auth'
 
 const router = express.Router()
@@ -37,12 +37,19 @@ router.post('/', requireAuth, async (req: Request, res: Response) => {
 
   const ownerId = (req as AuthRequest).userId
 
-  const repo = await prisma.repository.create({
-    data: { name, description, ownerId },
-    include: { owner: { select: { id: true, name: true } } },
-  })
-
-  res.status(201).json(repo)
+  try {
+    const repo = await prisma.repository.create({
+      data: { name, description, ownerId },
+      include: { owner: { select: { id: true, name: true } } },
+    })
+    res.status(201).json(repo)
+  } catch (err) {
+    if (err instanceof Prisma.PrismaClientKnownRequestError && err.code === 'P2002') {
+      res.status(409).json({ error: 'repository name already exists' })
+      return
+    }
+    throw err
+  }
 })
 
 router.patch('/:id', requireAuth, async (req: Request, res: Response) => {

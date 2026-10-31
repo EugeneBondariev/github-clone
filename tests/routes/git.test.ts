@@ -192,4 +192,10 @@ describe('refs', () => {
     expect(res.status).toBe(200)
     expect(res.body).toHaveLength(1)
   })
+
+  it('returns 404 for unknown branch', async () => {
+    const res = await request(app).get('/git/repos/999/refs/nonexistent')
+    expect(res.status).toBe(404)
+    expect(res.body.error).toBe('ref not found')
+  })
 })

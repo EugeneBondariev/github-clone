@@ -15,7 +15,14 @@ afterAll(() => {
   delete process.env.GIT_OBJECTS_DIR
 })
 
-import { writeBlob, readBlob, writeTree, readTree, writeCommit, readCommit } from '../../git/objects'
+import {
+  writeBlob,
+  readBlob,
+  writeTree,
+  readTree,
+  writeCommit,
+  readCommit,
+} from '../../git/objects'
 
 describe('blob', () => {
   it('writes and reads back content', () => {

@@ -15,17 +15,13 @@ describe('requireAuth middleware', () => {
   })
 
   it('returns 401 with malformed token', async () => {
-    const res = await request(app)
-      .delete('/users/1')
-      .set('Authorization', 'Bearer not-a-valid-jwt')
+    const res = await request(app).delete('/users/1').set('Authorization', 'Bearer not-a-valid-jwt')
     expect(res.status).toBe(401)
     expect(res.body.error).toBe('invalid token')
   })
 
   it('returns 401 when Bearer prefix is missing', async () => {
-    const res = await request(app)
-      .delete('/users/1')
-      .set('Authorization', 'token-without-bearer')
+    const res = await request(app).delete('/users/1').set('Authorization', 'token-without-bearer')
     expect(res.status).toBe(401)
     expect(res.body.error).toBe('missing token')
   })

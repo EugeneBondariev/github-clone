@@ -1,16 +1,23 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import request from 'supertest'
 
-const { mockCreate, mockFindUnique } = vi.hoisted(() => ({
-  mockCreate: vi.fn(),
-  mockFindUnique: vi.fn(),
-}))
+const { mockCreate, mockFindUnique, PrismaKnownError } = vi.hoisted(() => {
+  class PrismaKnownError extends Error {
+    code: string
+    constructor(code: string) {
+      super('Prisma error')
+      this.code = code
+    }
+  }
+  return { mockCreate: vi.fn(), mockFindUnique: vi.fn(), PrismaKnownError }
+})
 
 vi.mock('../../generated/prisma/client', () => ({
   PrismaClient: class {
     user = { create: mockCreate, findUnique: mockFindUnique }
     repository = {}
   },
+  Prisma: { PrismaClientKnownRequestError: PrismaKnownError },
 }))
 
 vi.mock('@prisma/adapter-pg', () => ({
@@ -26,7 +33,12 @@ beforeEach(() => {
 
 describe('POST /auth/register', () => {
   it('creates a user and returns it without password', async () => {
-    mockCreate.mockResolvedValue({ id: 1, name: 'Alice', email: 'alice@example.com', createdAt: new Date() })
+    mockCreate.mockResolvedValue({
+      id: 1,
+      name: 'Alice',
+      email: 'alice@example.com',
+      createdAt: new Date(),
+    })
 
     const res = await request(app)
       .post('/auth/register')
@@ -35,6 +47,17 @@ describe('POST /auth/register', () => {
     expect(res.status).toBe(201)
     expect(res.body.email).toBe('alice@example.com')
     expect(res.body.password).toBeUndefined()
+  })
+
+  it('returns 409 for duplicate email', async () => {
+    mockCreate.mockRejectedValue(new PrismaKnownError('P2002'))
+
+    const res = await request(app)
+      .post('/auth/register')
+      .send({ name: 'Alice', email: 'alice@example.com', password: 'secret123' })
+
+    expect(res.status).toBe(409)
+    expect(res.body.error).toBe('email already in use')
   })
 })
 

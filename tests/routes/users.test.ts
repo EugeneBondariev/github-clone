@@ -31,7 +31,9 @@ beforeEach(() => {
 
 describe('GET /users', () => {
   it('returns list of users', async () => {
-    mockFindMany.mockResolvedValue([{ id: 1, name: 'Alice', email: 'alice@example.com', createdAt: new Date() }])
+    mockFindMany.mockResolvedValue([
+      { id: 1, name: 'Alice', email: 'alice@example.com', createdAt: new Date() },
+    ])
     const res = await request(app).get('/users')
     expect(res.status).toBe(200)
     expect(res.body).toHaveLength(1)
@@ -40,7 +42,12 @@ describe('GET /users', () => {
 
 describe('GET /users/:id', () => {
   it('returns user when found', async () => {
-    mockFindUnique.mockResolvedValue({ id: 1, name: 'Alice', email: 'alice@example.com', createdAt: new Date() })
+    mockFindUnique.mockResolvedValue({
+      id: 1,
+      name: 'Alice',
+      email: 'alice@example.com',
+      createdAt: new Date(),
+    })
     const res = await request(app).get('/users/1')
     expect(res.status).toBe(200)
     expect(res.body.name).toBe('Alice')
@@ -55,7 +62,13 @@ describe('GET /users/:id', () => {
 
 describe('GET /users/:id/repos', () => {
   it('returns repos for a user', async () => {
-    mockFindUnique.mockResolvedValue({ id: 1, name: 'Alice', email: 'alice@example.com', createdAt: new Date(), repositories: [{ id: 1, name: 'my-repo' }] })
+    mockFindUnique.mockResolvedValue({
+      id: 1,
+      name: 'Alice',
+      email: 'alice@example.com',
+      createdAt: new Date(),
+      repositories: [{ id: 1, name: 'my-repo' }],
+    })
     const res = await request(app).get('/users/1/repos')
     expect(res.status).toBe(200)
     expect(res.body).toHaveLength(1)
