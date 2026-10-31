@@ -1,10 +1,12 @@
 node_modules
+/client/node_modules
 /data/
 .env
 
 # Build artifacts
 /generated/
 /dist/
+/client/dist/
 /coverage/
 
 # Prisma auto-generated AI skills
