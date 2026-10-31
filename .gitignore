@@ -1,9 +1,11 @@
 node_modules
+/data/
 .env
 
 # Build artifacts
 /generated/
 /dist/
+/coverage/
 
 # Prisma auto-generated AI skills
 /.agents/
