@@ -42,7 +42,7 @@ describe('POST /auth/register', () => {
 
     const res = await request(app)
       .post('/auth/register')
-      .send({ name: 'Alice', email: 'alice@example.com', password: 'secret123' })
+      .send({ name: 'Alice', email: 'alice@example.com', password: 'Secret123!' })
 
     expect(res.status).toBe(201)
     expect(res.body.email).toBe('alice@example.com')
@@ -54,7 +54,7 @@ describe('POST /auth/register', () => {
 
     const res = await request(app)
       .post('/auth/register')
-      .send({ name: 'Alice', email: 'alice@example.com', password: 'secret123' })
+      .send({ name: 'Alice', email: 'alice@example.com', password: 'Secret123!' })
 
     expect(res.status).toBe(409)
     expect(res.body.error).toBe('email already in use')
@@ -64,12 +64,12 @@ describe('POST /auth/register', () => {
 describe('POST /auth/login', () => {
   it('returns a token for valid credentials', async () => {
     const bcrypt = await import('bcrypt')
-    const hashed = await bcrypt.hash('secret123', 10)
+    const hashed = await bcrypt.hash('Secret123!', 10)
     mockFindUnique.mockResolvedValue({ id: 1, email: 'alice@example.com', password: hashed })
 
     const res = await request(app)
       .post('/auth/login')
-      .send({ email: 'alice@example.com', password: 'secret123' })
+      .send({ email: 'alice@example.com', password: 'Secret123!' })
 
     expect(res.status).toBe(200)
     expect(res.body.token).toBeDefined()
