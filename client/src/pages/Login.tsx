@@ -2,7 +2,6 @@ import { useState } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import { api } from '../services/api'
 import { useAuth } from '../hooks/useAuth'
-import styles from './Auth.module.css'
 
 export default function Login() {
   const navigate = useNavigate()
@@ -23,7 +22,7 @@ export default function Login() {
   }
 
   return (
-    <div className={styles.form}>
+    <main className="max-w-100">
       <h2>Log in</h2>
       {error && <p className="error">{error}</p>}
       <form onSubmit={handleSubmit}>
@@ -48,9 +47,9 @@ export default function Login() {
         </label>
         <button type="submit">Log in</button>
       </form>
-      <p className={styles.footer}>
+      <p className="mt-4 text-sm text-gh-muted">
         No account? <Link to="/register">Register</Link>
       </p>
-    </div>
+    </main>
   )
 }

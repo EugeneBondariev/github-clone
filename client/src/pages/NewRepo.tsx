@@ -19,7 +19,7 @@ export default function NewRepo() {
   }
 
   return (
-    <div>
+    <main>
       <Link to="/">← All repositories</Link>
       <h2>New repository</h2>
       {error && <p className="error">{error}</p>}
@@ -34,6 +34,6 @@ export default function NewRepo() {
         </label>
         <button type="submit">Create repository</button>
       </form>
-    </div>
+    </main>
   )
 }

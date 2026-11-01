@@ -2,7 +2,6 @@ import { useState } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import { api } from '../services/api'
 import { useAuth } from '../hooks/useAuth'
-import styles from './Auth.module.css'
 
 export default function Register() {
   const navigate = useNavigate()
@@ -25,7 +24,7 @@ export default function Register() {
   }
 
   return (
-    <div className={styles.form}>
+    <main className="max-w-100">
       <h2>Create account</h2>
       {error && <p className="error">{error}</p>}
       <form onSubmit={handleSubmit}>
@@ -48,9 +47,9 @@ export default function Register() {
         </label>
         <button type="submit">Register</button>
       </form>
-      <p className={styles.footer}>
+      <p className="mt-4 text-sm text-gh-muted">
         Already have an account? <Link to="/login">Log in</Link>
       </p>
-    </div>
+    </main>
   )
 }

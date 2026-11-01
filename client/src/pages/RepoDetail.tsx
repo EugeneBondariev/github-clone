@@ -3,7 +3,6 @@ import { useParams, useNavigate, Link } from 'react-router-dom'
 import { api } from '../services/api'
 import type { Repo } from '../services/api'
 import { useAuth } from '../hooks/useAuth'
-import styles from './RepoDetail.module.css'
 
 export default function RepoDetail() {
   const { id } = useParams<{ id: string }>()
@@ -47,17 +46,17 @@ export default function RepoDetail() {
     }
   }
 
-  if (error) return <p className="error">{error}</p>
-  if (!repo) return <p>Loading…</p>
+  if (error) return <main><p className="error">{error}</p></main>
+  if (!repo) return <main><p>Loading…</p></main>
 
   const isOwner = userId === repo.ownerId
 
   return (
-    <div>
+    <main>
       <Link to="/">← All repositories</Link>
 
       {editing ? (
-        <div className={styles.editForm}>
+        <div className="flex flex-col gap-4 max-w-100 mt-4">
           <h2>Edit repository</h2>
           <label>
             Name
@@ -67,8 +66,10 @@ export default function RepoDetail() {
             Description
             <input value={description} onChange={(e) => setDescription(e.target.value)} />
           </label>
-          <button onClick={handleSave}>Save</button>
-          <button onClick={() => setEditing(false)}>Cancel</button>
+          <div className="flex gap-2">
+            <button onClick={handleSave}>Save</button>
+            <button onClick={() => setEditing(false)}>Cancel</button>
+          </div>
         </div>
       ) : (
         <>
@@ -76,18 +77,21 @@ export default function RepoDetail() {
             {repo.owner.name} / {repo.name}
           </h2>
           {repo.description && <p>{repo.description}</p>}
-          <p className={styles.meta}>Created {new Date(repo.createdAt).toLocaleDateString()}</p>
+          <p className="text-[13px] text-gh-muted">Created {new Date(repo.createdAt).toLocaleDateString()}</p>
 
           {isOwner && (
-            <div className={styles.actions}>
+            <div className="flex gap-2 mt-6">
               <button onClick={() => setEditing(true)}>Edit</button>
-              <button className="danger" onClick={handleDelete}>
+              <button
+                className="border-gh-danger text-gh-danger hover:bg-[#f8514920]"
+                onClick={handleDelete}
+              >
                 Delete
               </button>
             </div>
           )}
         </>
       )}
-    </div>
+    </main>
   )
 }
