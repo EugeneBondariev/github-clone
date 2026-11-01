@@ -39,11 +39,11 @@ describe('Register', () => {
 
     await user.type(screen.getByLabelText(/^name/i), 'Alice')
     await user.type(screen.getByLabelText(/email/i), 'alice@example.com')
-    await user.type(screen.getByLabelText(/password/i), 'secret')
+    await user.type(screen.getByLabelText(/password/i), 'Secret123!')
     await user.click(screen.getByRole('button', { name: /register/i }))
 
-    expect(mockRegister).toHaveBeenCalledWith('Alice', 'alice@example.com', 'secret')
-    expect(mockApiLogin).toHaveBeenCalledWith('alice@example.com', 'secret')
+    expect(mockRegister).toHaveBeenCalledWith('Alice', 'alice@example.com', 'Secret123!')
+    expect(mockApiLogin).toHaveBeenCalledWith('alice@example.com', 'Secret123!')
     expect(mockAuthLogin).toHaveBeenCalledWith('tok456')
     expect(mockNavigate).toHaveBeenCalledWith('/')
   })
@@ -55,7 +55,7 @@ describe('Register', () => {
 
     await user.type(screen.getByLabelText(/^name/i), 'Alice')
     await user.type(screen.getByLabelText(/email/i), 'alice@example.com')
-    await user.type(screen.getByLabelText(/password/i), 'secret')
+    await user.type(screen.getByLabelText(/password/i), 'Secret123!')
     await user.click(screen.getByRole('button', { name: /register/i }))
 
     expect(await screen.findByText('email already in use')).toBeInTheDocument()
