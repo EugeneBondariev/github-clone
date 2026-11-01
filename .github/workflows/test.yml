@@ -24,6 +24,11 @@ jobs:
       - name: Install server deps
         run: npm ci --prefix server
 
+      - name: Generate Prisma client
+        run: npm run db:generate --prefix server
+        env:
+          DATABASE_URL: postgresql://placeholder/placeholder
+
       - name: Run server tests
         run: npm test --prefix server
         env:
