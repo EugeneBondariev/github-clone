@@ -3,13 +3,15 @@ import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { MemoryRouter } from 'react-router-dom'
 
-const { mockNavigate, mockGetRepo, mockUpdateRepo, mockDeleteRepo, mockUseAuth } = vi.hoisted(() => ({
-  mockNavigate: vi.fn(),
-  mockGetRepo: vi.fn(),
-  mockUpdateRepo: vi.fn(),
-  mockDeleteRepo: vi.fn(),
-  mockUseAuth: vi.fn(),
-}))
+const { mockNavigate, mockGetRepo, mockUpdateRepo, mockDeleteRepo, mockUseAuth } = vi.hoisted(
+  () => ({
+    mockNavigate: vi.fn(),
+    mockGetRepo: vi.fn(),
+    mockUpdateRepo: vi.fn(),
+    mockDeleteRepo: vi.fn(),
+    mockUseAuth: vi.fn(),
+  })
+)
 
 vi.mock('react-router-dom', async () => {
   const actual = await vi.importActual<typeof import('react-router-dom')>('react-router-dom')
@@ -83,7 +85,9 @@ describe('RepoDetail', () => {
     await user.type(nameInput, 'new-name')
     await user.click(screen.getByRole('button', { name: 'Save' }))
 
-    await waitFor(() => expect(mockUpdateRepo).toHaveBeenCalledWith(1, expect.objectContaining({ name: 'new-name' })))
+    await waitFor(() =>
+      expect(mockUpdateRepo).toHaveBeenCalledWith(1, expect.objectContaining({ name: 'new-name' }))
+    )
   })
 
   it('calls deleteRepo and navigates home on delete', async () => {
@@ -91,10 +95,10 @@ describe('RepoDetail', () => {
     mockGetRepo.mockResolvedValue(repo)
     mockDeleteRepo.mockResolvedValue(undefined)
     mockUseAuth.mockReturnValue({ userId: 1 })
-    vi.spyOn(window, 'confirm').mockReturnValue(true)
     renderRepoDetail()
 
     await user.click(await screen.findByRole('button', { name: 'Delete' }))
+    await user.click(screen.getByRole('button', { name: 'Confirm' }))
 
     await waitFor(() => expect(mockDeleteRepo).toHaveBeenCalledWith(1))
     expect(mockNavigate).toHaveBeenCalledWith('/')

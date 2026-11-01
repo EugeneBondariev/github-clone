@@ -11,6 +11,7 @@ export default function RepoDetail() {
 
   const [repo, setRepo] = useState<Repo | null>(null)
   const [editing, setEditing] = useState(false)
+  const [confirmDelete, setConfirmDelete] = useState(false)
   const [name, setName] = useState('')
   const [description, setDescription] = useState('')
   const [error, setError] = useState('')
@@ -37,7 +38,6 @@ export default function RepoDetail() {
   }
 
   async function handleDelete() {
-    if (!confirm(`Delete ${repo?.name}?`)) return
     try {
       await api.deleteRepo(Number(id))
       navigate('/')
@@ -46,8 +46,18 @@ export default function RepoDetail() {
     }
   }
 
-  if (error) return <main><p className="error">{error}</p></main>
-  if (!repo) return <main><p>Loading…</p></main>
+  if (error)
+    return (
+      <main>
+        <p className="error">{error}</p>
+      </main>
+    )
+  if (!repo)
+    return (
+      <main>
+        <p>Loading…</p>
+      </main>
+    )
 
   const isOwner = userId === repo.ownerId
 
@@ -77,17 +87,32 @@ export default function RepoDetail() {
             {repo.owner.name} / {repo.name}
           </h2>
           {repo.description && <p>{repo.description}</p>}
-          <p className="text-[13px] text-gh-muted">Created {new Date(repo.createdAt).toLocaleDateString()}</p>
+          <p className="text-[13px] text-gh-muted">
+            Created {new Date(repo.createdAt).toLocaleDateString()}
+          </p>
 
           {isOwner && (
-            <div className="flex gap-2 mt-6">
+            <div className="flex items-center gap-2 mt-6">
               <button onClick={() => setEditing(true)}>Edit</button>
-              <button
-                className="border-gh-danger text-gh-danger hover:bg-[#f8514920]"
-                onClick={handleDelete}
-              >
-                Delete
-              </button>
+              {confirmDelete ? (
+                <>
+                  <span className="text-sm text-gh-muted">Are you sure?</span>
+                  <button
+                    className="border-gh-danger text-gh-danger hover:bg-[#f8514920]"
+                    onClick={handleDelete}
+                  >
+                    Confirm
+                  </button>
+                  <button onClick={() => setConfirmDelete(false)}>Cancel</button>
+                </>
+              ) : (
+                <button
+                  className="border-gh-danger text-gh-danger hover:bg-[#f8514920]"
+                  onClick={() => setConfirmDelete(true)}
+                >
+                  Delete
+                </button>
+              )}
             </div>
           )}
         </>
