@@ -8,6 +8,7 @@
     "test": "npm run test:server && npm run test:client",
     "test:server": "npm test --prefix server",
     "test:client": "npm test --prefix client",
+    "test:e2e": "npm run test:e2e --prefix client",
     "format": "prettier --write ."
   },
   "devDependencies": {

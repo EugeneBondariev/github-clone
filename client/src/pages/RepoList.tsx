@@ -44,11 +44,16 @@ export default function RepoList() {
 
         <ul className="list-none p-0 m-0 border border-gh-border rounded-md overflow-hidden">
           {repos.map((repo) => (
-            <li key={repo.id} className="p-4 bg-gh-secondary border-b border-gh-border last:border-b-0">
+            <li
+              key={repo.id}
+              className="p-4 bg-gh-secondary border-b border-gh-border last:border-b-0"
+            >
               <Link to={`/repos/${repo.id}`}>
                 <strong>{repo.owner.name}</strong> / <strong>{repo.name}</strong>
               </Link>
-              {repo.description && <p className="mt-1 text-[13px] text-gh-muted">{repo.description}</p>}
+              {repo.description && (
+                <p className="mt-1 text-[13px] text-gh-muted">{repo.description}</p>
+              )}
             </li>
           ))}
         </ul>

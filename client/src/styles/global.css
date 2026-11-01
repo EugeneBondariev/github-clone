@@ -1,4 +1,4 @@
-@import "tailwindcss";
+@import 'tailwindcss';
 
 @theme {
   --color-gh-bg: #0d1117;
@@ -12,7 +12,9 @@
 }
 
 @layer base {
-  *, *::before, *::after {
+  *,
+  *::before,
+  *::after {
     box-sizing: border-box;
   }
 
@@ -25,7 +27,8 @@
     @apply text-gh-blue no-underline hover:underline;
   }
 
-  h1, h2 {
+  h1,
+  h2 {
     @apply mt-0 mb-4 font-semibold;
   }
 
@@ -47,7 +50,7 @@
 }
 
 @layer components {
-  .container {
+  .layout {
     @apply max-w-215 mx-auto px-5 py-8;
   }
 

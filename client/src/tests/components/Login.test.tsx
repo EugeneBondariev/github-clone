@@ -36,10 +36,10 @@ describe('Login', () => {
     renderLogin()
 
     await user.type(screen.getByLabelText(/email/i), 'alice@example.com')
-    await user.type(screen.getByLabelText(/password/i), 'secret')
+    await user.type(screen.getByLabelText(/password/i), 'secret123')
     await user.click(screen.getByRole('button', { name: /log in/i }))
 
-    expect(mockApiLogin).toHaveBeenCalledWith('alice@example.com', 'secret')
+    expect(mockApiLogin).toHaveBeenCalledWith('alice@example.com', 'secret123')
     expect(mockAuthLogin).toHaveBeenCalledWith('tok123')
     expect(mockNavigate).toHaveBeenCalledWith('/')
   })
@@ -50,7 +50,7 @@ describe('Login', () => {
     renderLogin()
 
     await user.type(screen.getByLabelText(/email/i), 'alice@example.com')
-    await user.type(screen.getByLabelText(/password/i), 'wrong')
+    await user.type(screen.getByLabelText(/password/i), 'wrongpassword')
     await user.click(screen.getByRole('button', { name: /log in/i }))
 
     expect(await screen.findByText('invalid credentials')).toBeInTheDocument()
