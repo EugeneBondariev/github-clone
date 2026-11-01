@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest'
+import { describe, it, expect, vi, afterEach } from 'vitest'
 import { parseUserId } from '../../hooks/AuthContext'
 
 function fakeJwt(payload: object): string {
@@ -20,5 +20,15 @@ describe('parseUserId', () => {
 
   it('returns null for an empty string', () => {
     expect(parseUserId('')).toBeNull()
+  })
+
+  it('returns null for an expired token', () => {
+    const expiredExp = Math.floor(Date.now() / 1000) - 1
+    expect(parseUserId(fakeJwt({ userId: 42, exp: expiredExp }))).toBeNull()
+  })
+
+  it('extracts userId from a token that has not yet expired', () => {
+    const futureExp = Math.floor(Date.now() / 1000) + 3600
+    expect(parseUserId(fakeJwt({ userId: 42, exp: futureExp }))).toBe(42)
   })
 })

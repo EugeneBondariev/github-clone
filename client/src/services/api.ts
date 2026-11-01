@@ -15,6 +15,7 @@ async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
     },
   })
   if (!res.ok) {
+    if (res.status === 401) window.dispatchEvent(new Event('auth:logout'))
     const body = await res.json().catch(() => ({}))
     throw new Error(body.error ?? `HTTP ${res.status}`)
   }
