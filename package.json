@@ -5,7 +5,9 @@
     "dev:all": "npm run db:start --prefix server && concurrently -n api,client -c cyan,magenta \"npm run dev --prefix server\" \"npm run dev --prefix client\"",
     "dev:client": "npm run dev --prefix client",
     "dev:server": "npm run dev --prefix server",
-    "test": "npm test --prefix server",
+    "test": "npm run test:server && npm run test:client",
+    "test:server": "npm test --prefix server",
+    "test:client": "npm test --prefix client",
     "format": "prettier --write ."
   },
   "devDependencies": {
