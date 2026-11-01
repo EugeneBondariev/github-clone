@@ -3,6 +3,12 @@ import { createRoot } from 'react-dom/client'
 import './styles/global.css'
 import App from './App.tsx'
 
+if (import.meta.env.DEV) {
+  Promise.all([import('react'), import('react-dom'), import('@axe-core/react')]).then(
+    ([React, ReactDOM, { default: axe }]) => axe(React, ReactDOM, 1000)
+  )
+}
+
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <App />
